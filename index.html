@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark API 首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: Lato, 'Helvetica Neue', Arial, Helvetica, 'Microsoft YaHei', sans-serif;
+            background: var(--semi-color-bg-0, #ffffff);
+            color: var(--semi-color-text-0, #1f2329);
+            min-height: 100vh;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .page {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 24px 20px 56px;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            min-height: 480px;
+            padding: 92px 16px 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--semi-color-border, rgba(31, 35, 41, 0.08));
+        }
+
+        .blur-ball {
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .blur-indigo {
+            background: #6366f1;
+            top: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.22;
+        }
+
+        .blur-teal {
+            background: #14b8a6;
+            top: 188px;
+            left: 18%;
+            opacity: 0.16;
+        }
+
+        .blur-pink {
+            background: #f472b6;
+            top: 78px;
+            right: 8%;
+            opacity: 0.14;
+        }
+
+        .hero-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            margin-bottom: 20px;
+            border-radius: 999px;
+            border: 1px solid rgba(99, 102, 241, 0.18);
+            background: rgba(99, 102, 241, 0.08);
+            color: #4f46e5;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .hero-badge i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            display: inline-block;
+            flex: 0 0 auto;
+        }
+
+        .hero h1 {
+            font-size: clamp(46px, 8vw, 72px);
+            line-height: 1.02;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            color: var(--semi-color-text-0, #1f2329);
+            margin-bottom: 18px;
+        }
+
+        .hero p {
+            max-width: 760px;
+            margin: 0 auto;
+            font-size: 18px;
+            line-height: 1.8;
+            color: var(--semi-color-text-1, #646a73);
+        }
+
+        .hero-tags {
+            margin-top: 24px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .tag {
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .tag-indigo {
+            background: #eef2ff;
+            color: #4338ca;
+            border-color: #c7d2fe;
+        }
+
+        .tag-blue {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #bfdbfe;
+        }
+
+        .tag-mint {
+            background: #ecfeff;
+            color: #0f766e;
+            border-color: #99f6e4;
+        }
+
+        .tag-amber {
+            background: #fffbeb;
+            color: #b45309;
+            border-color: #fde68a;
+        }
+
+        .board {
+            margin: 28px 0 20px;
+            padding: 10px;
+            border-radius: 24px;
+            border: 1px solid rgba(99, 102, 241, 0.12);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(20, 184, 166, 0.08) 100%);
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .board-item {
+            min-height: 160px;
+            padding: 22px 18px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(14px);
+        }
+
+        .board-item strong {
+            display: block;
+            font-size: clamp(24px, 2.5vw, 34px);
+            line-height: 1.15;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--semi-color-text-0, #1f2329);
+            margin-bottom: 10px;
+        }
+
+        .board-item span {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--semi-color-text-2, #86909c);
+            margin-bottom: 10px;
+        }
+
+        .board-item p {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--semi-color-text-1, #646a73);
+        }
+
+        .board-yellow {
+            background: linear-gradient(180deg, #fff8e8 0%, rgba(255, 255, 255, 0.88) 100%);
+            border-color: #fde68a;
+        }
+
+        .board-blue {
+            background: linear-gradient(180deg, #edf6ff 0%, rgba(255, 255, 255, 0.88) 100%);
+            border-color: #bfdbfe;
+        }
+
+        .board-purple {
+            background: linear-gradient(180deg, #f5f3ff 0%, rgba(255, 255, 255, 0.88) 100%);
+            border-color: #ddd6fe;
+        }
+
+        .board-mint {
+            background: linear-gradient(180deg, #ecfeff 0%, rgba(255, 255, 255, 0.88) 100%);
+            border-color: #99f6e4;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+            min-height: 240px;
+            border-radius: 22px;
+            border: 1px solid var(--semi-color-border, rgba(31, 35, 41, 0.08));
+            background: var(--semi-color-fill-0, #fafafa);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--accent, #6366f1);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            right: -56px;
+            top: -56px;
+            border-radius: 50%;
+            background: var(--glow, rgba(99, 102, 241, 0.16));
+            filter: blur(26px);
+            pointer-events: none;
+        }
+
+        .card-inner {
+            position: relative;
+            z-index: 1;
+            padding: 28px;
+        }
+
+        .card-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--semi-color-text-2, #86909c);
+            margin-bottom: 16px;
+        }
+
+        .card h2 {
+            font-size: 28px;
+            line-height: 1.25;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--semi-color-text-0, #1f2329);
+            margin-bottom: 14px;
+        }
+
+        .card p {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--semi-color-text-1, #646a73);
+        }
+
+        .card-meta {
+            margin-top: 18px;
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            color: var(--semi-color-text-0, #1f2329);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .card-yellow {
+            --accent: #f59e0b;
+            --glow: rgba(245, 158, 11, 0.18);
+            background: linear-gradient(180deg, #fff7e6 0%, #fffdf7 100%);
+        }
+
+        .card-blue {
+            --accent: #3b82f6;
+            --glow: rgba(59, 130, 246, 0.16);
+            background: linear-gradient(180deg, #eef6ff 0%, #fbfdff 100%);
+        }
+
+        .card-purple {
+            --accent: #8b5cf6;
+            --glow: rgba(139, 92, 246, 0.16);
+            background: linear-gradient(180deg, #f6f1ff 0%, #fcfbff 100%);
+        }
+
+        .card-mint {
+            --accent: #14b8a6;
+            --glow: rgba(20, 184, 166, 0.16);
+            background: linear-gradient(180deg, #effcf8 0%, #fbfffe 100%);
+        }
+
+        .action-bar {
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+            padding: 24px 26px;
+            border-radius: 22px;
+            border: 1px solid var(--semi-color-border, rgba(31, 35, 41, 0.08));
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(14px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .action-bar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 0% 100%, rgba(244, 114, 182, 0.14) 0%, transparent 35%), radial-gradient(circle at 100% 0%, rgba(99, 102, 241, 0.14) 0%, transparent 35%), radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.10) 0%, transparent 45%);
+            filter: blur(40px);
+            pointer-events: none;
+        }
+
+        .action-copy,
+        .action-button {
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-copy h3 {
+            font-size: 24px;
+            line-height: 1.2;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--semi-color-text-0, #1f2329);
+            margin-bottom: 8px;
+        }
+
+        .action-copy p {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--semi-color-text-1, #646a73);
+        }
+
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 124px;
+            padding: 13px 18px;
+            border-radius: 999px;
+            background: var(--semi-color-primary, #6366f1);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            color: #646a73;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s;
+            z-index: 2;
+        }
+
+        .code-block-wrapper:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            color: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        @media (max-width: 1024px) {
+            .board-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page {
+                padding: 16px 16px 40px;
+            }
+
+            .hero {
+                min-height: auto;
+                padding: 76px 8px 56px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .cards,
+            .board-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card,
+            .board-item {
+                min-height: auto;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .action-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <section class="hero">
+            <div class="blur-ball blur-indigo"></div>
+            <div class="blur-ball blur-teal"></div>
+            <div class="blur-ball blur-pink"></div>
+            <div class="hero-inner">
+                <div class="hero-badge"><i></i>高性能大模型接口服务</div>
+                <h1>Spark API</h1>
+                <p>为您提供稳定、高效的 AI 接口聚合服务。只需替换基址，即可无缝接入 100+ 主流模型。</p>
+                <div class="hero-tags">
+                    <div class="tag tag-indigo">全系 Claude</div>
+                    <div class="tag tag-blue">全系 GPT</div>
+                    <div class="tag tag-mint">全系 Gemini</div>
+                    <div class="tag tag-amber">CLI 完整兼容</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="board">
+            <div class="board-grid">
+                <div class="board-item board-yellow">
+                    <strong>100+</strong>
+                    <span>可用模型</span>
+                    <p>支持行业最前沿的模型版本，持续同步最新更新</p>
+                </div>
+                <div class="board-item board-blue">
+                    <strong>高并发</strong>
+                    <span>负载均衡</span>
+                    <p>多渠道智能路由，动态分配请求，提升整体稳定性</p>
+                </div>
+                <div class="board-item board-purple">
+                    <strong>&lt;50ms</strong>
+                    <span>接口延迟</span>
+                    <p>极致优化的网络链路，提供更快速的响应体验</p>
+                </div>
+                <div class="board-item board-mint">
+                    <strong>0</strong>
+                    <span>接入成本</span>
+                    <p>完全兼容 OpenAI 标准格式，无需修改现有代码</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cards">
+            <article class="card card-purple">
+                <div class="card-inner">
+                    <div class="card-label">全模型支持</div>
+                    <h2>主流模型，一站接入</h2>
+                    <p>完整覆盖 Claude、GPT、Gemini 等行业顶级大模型系列。提供从轻量级到旗舰级的全维度模型选择，满足各种复杂度的业务需求。</p>
+                    <div class="card-meta">100+ 模型 · 持续上新</div>
+                </div>
+            </article>
+
+            <article class="card card-blue">
+                <div class="card-inner">
+                    <div class="card-label">开发者友好</div>
+                    <h2>兼容 IDE 与 CLI 生态</h2>
+                    <p>完美适配 Cursor 等 AI IDE，以及 Claude Code、Codex 等命令行辅助工具。根据不同工具生态，灵活配置接入基址。</p>
+                    
+                    <div style="margin-top: 20px; font-size: 14px; background: rgba(255,255,255,0.6); padding: 16px; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                        <h4 style="margin-bottom: 12px; color: #1d4ed8; font-size: 15px;">🔗 基础接入地址配置</h4>
+                        <div style="margin-bottom: 12px;">
+                            <strong>Claude 生态工具 (如 Claude Code):</strong><br>
+                            <code class="copyable-code" onclick="copyText('https://sparkide.top', this)" title="点击复制" style="background: #eef2ff; padding: 2px 6px; border-radius: 4px; color: #4338ca; cursor: pointer; display: inline-block; transition: all 0.2s;">https://sparkide.top</code>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong>OpenAI 兼容生态 (如 Codex, Cursor):</strong><br>
+                            <code class="copyable-code" onclick="copyText('https://sparkide.top/v1', this)" title="点击复制" style="background: #eef2ff; padding: 2px 6px; border-radius: 4px; color: #4338ca; cursor: pointer; display: inline-block; transition: all 0.2s;">https://sparkide.top/v1</code>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="guide-section" style="margin-top: 32px; border-radius: 22px; border: 1px solid rgba(31, 35, 41, 0.08); background: var(--semi-color-fill-0, #fafafa); padding: 32px;">
+            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 24px; color: #1f2329;">🛠️ 主流工具配置指南</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                <!-- Claude Code -->
+                <div style="background: #ffffff; padding: 20px; border-radius: 16px; border: 1px solid #e8e8e8;">
+                    <h3 style="font-size: 18px; margin-bottom: 12px; color: #1f2329;">Claude Code</h3>
+                    <p style="font-size: 13px; color: #646a73; margin-bottom: 16px;">基于 Anthropic 协议的 CLI 工具配置方式：</p>
+                    
+                    <div style="margin-bottom: 12px; position: relative;" class="code-block-wrapper">
+                        <strong style="font-size: 13px;">macOS / Linux:</strong>
+                        <button class="copy-btn" onclick="copyCodeBlock(this)">复制</button>
+                        <pre style="background: #f4f5f5; padding: 10px; border-radius: 8px; font-size: 12px; overflow-x: auto; margin-top: 6px;"><code>export ANTHROPIC_BASE_URL="https://sparkide.top"
+export ANTHROPIC_API_KEY="sk-您的令牌"</code></pre>
+                    </div>
+                    
+                    <div style="position: relative;" class="code-block-wrapper">
+                        <strong style="font-size: 13px;">Windows (PowerShell):</strong>
+                        <button class="copy-btn" onclick="copyCodeBlock(this)">复制</button>
+                        <pre style="background: #f4f5f5; padding: 10px; border-radius: 8px; font-size: 12px; overflow-x: auto; margin-top: 6px;"><code>$env:ANTHROPIC_BASE_URL="https://sparkide.top"
+$env:ANTHROPIC_API_KEY="sk-您的令牌"</code></pre>
+                    </div>
+                </div>
+
+                <!-- Codex -->
+                <div style="background: #ffffff; padding: 20px; border-radius: 16px; border: 1px solid #e8e8e8;">
+                    <h3 style="font-size: 18px; margin-bottom: 12px; color: #1f2329;">Codex CLI</h3>
+                    <p style="font-size: 13px; color: #646a73; margin-bottom: 16px;">基于 OpenAI 协议的 CLI 工具配置方式：</p>
+                    
+                    <div style="margin-bottom: 12px; position: relative;" class="code-block-wrapper">
+                        <strong style="font-size: 13px;">macOS / Linux:</strong>
+                        <button class="copy-btn" onclick="copyCodeBlock(this)">复制</button>
+                        <pre style="background: #f4f5f5; padding: 10px; border-radius: 8px; font-size: 12px; overflow-x: auto; margin-top: 6px;"><code>export OPENAI_BASE_URL="https://sparkide.top/v1"
+export OPENAI_API_KEY="sk-您的令牌"</code></pre>
+                    </div>
+                    
+                    <div style="position: relative;" class="code-block-wrapper">
+                        <strong style="font-size: 13px;">Windows (PowerShell):</strong>
+                        <button class="copy-btn" onclick="copyCodeBlock(this)">复制</button>
+                        <pre style="background: #f4f5f5; padding: 10px; border-radius: 8px; font-size: 12px; overflow-x: auto; margin-top: 6px;"><code>$env:OPENAI_BASE_URL="https://sparkide.top/v1"
+$env:OPENAI_API_KEY="sk-您的令牌"</code></pre>
+                    </div>
+                </div>
+
+                <!-- Cursor -->
+                <div style="background: #ffffff; padding: 20px; border-radius: 16px; border: 1px solid #e8e8e8;">
+                    <h3 style="font-size: 18px; margin-bottom: 12px; color: #1f2329;">Cursor IDE</h3>
+                    <div style="background: #fffbeb; border: 1px solid #fde68a; padding: 8px 12px; border-radius: 8px; font-size: 12px; color: #b45309; margin-bottom: 16px;">
+                        ⚠️ 注意：接入第三方 API 需拥有 Cursor <strong>Pro 账号</strong>。
+                    </div>
+                    <ol style="font-size: 13px; color: #646a73; padding-left: 20px; line-height: 1.8;">
+                        <li>打开 <strong>Cursor Settings</strong></li>
+                        <li>在侧边栏点击 <strong>Models</strong></li>
+                        <li>向下滚动找到 <strong>API Keys</strong> 并展开</li>
+                        <li>开启 <strong>OpenAI API Key</strong> 开关，填入令牌</li>
+                        <li>开启 <strong>Override OpenAI Base URL</strong>，填入：
+                            <div style="margin-top: 6px; position: relative;" class="code-block-wrapper">
+                                <button class="copy-btn" onclick="copyCodeBlock(this)">复制</button>
+                                <pre style="background: #f4f5f5; padding: 10px; border-radius: 8px; font-size: 12px; overflow-x: auto; margin: 0;"><code>https://sparkide.top/v1</code></pre>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <section class="action-bar">
+            <div class="action-copy">
+                <h3>即刻开启智能体验</h3>
+                <p>前往控制台获取您的专属 API 密钥，享受稳定、高速的大模型服务。</p>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <a class="action-button" href="/console/token" style="background: #14b8a6;">获取 API Key</a>
+                <a class="action-button" href="/console">前往控制台</a>
+            </div>
+        </section>
+    </div>
+
+    <!-- 复制提示框 -->
+    <div id="toast" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; justify-content: center; background: #ffffff; color: #1f2329; padding: 8px 18px; border-radius: 8px; font-size: 14px; line-height: 1.2; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 9999; border: 1px solid rgba(31, 35, 41, 0.12); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">已复制到剪贴板！</div>
+
+    <script>
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2000);
+        }
+
+        async function copyText(text, element) {
+            try {
+                await navigator.clipboard.writeText(text);
+                const originalBg = element.style.backgroundColor;
+                element.style.backgroundColor = '#d1fae5'; // 绿色高亮反馈
+                showToast();
+                setTimeout(() => {
+                    element.style.backgroundColor = originalBg;
+                }, 300);
+            } catch (err) {
+                console.error('复制失败', err);
+            }
+        }
+
+        async function copyCodeBlock(btn) {
+            const pre = btn.nextElementSibling;
+            const text = pre.innerText;
+            try {
+                await navigator.clipboard.writeText(text);
+                const originalText = btn.innerText;
+                btn.innerText = '已复制';
+                btn.style.background = '#10b981';
+                btn.style.color = '#fff';
+                btn.style.borderColor = '#10b981';
+                showToast();
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = '#ffffff';
+                    btn.style.color = '#1f2329';
+                    btn.style.borderColor = '#d1d5db';
+                }, 2000);
+            } catch (err) {
+                console.error('复制失败', err);
+            }
+        }
+    </script>
+</body>
+</html>
